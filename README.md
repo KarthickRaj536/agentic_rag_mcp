@@ -24,7 +24,7 @@ docker run -p 6333:6333 -p 6334:6334 -v qdrant_storage:/qdrant/storage:z qdrant/
 
 1. Create a free account: [https://brightdata.com/](https://brightdata.com/)
 2. Generate your credentials (email & password)
-3. Add them inside `server2.py`
+3. Add them inside `.env`
 
 ### 3️⃣ Configure MCP Server in Cursor
 
