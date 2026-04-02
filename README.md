@@ -1,16 +1,8 @@
 ---
 
-````markdown
 # 🚀 Agentic RAG System using MCP
 
-An **Agentic Retrieval-Augmented Generation (RAG)** application powered by the **Model Context Protocol (MCP)**, enabling seamless integration of custom AI tools inside the Cursor IDE.
-
----
-
-## 📺 Demo & Walkthrough
-
-🎥 Full walkthrough:  
-https://youtube.com/@machinelearningplus
+An **Agentic Retrieval-Augmented Generation (RAG)** application powered by the **Model Context Protocol (MCP)**, enabling seamless integration of custom AI tools inside the Cursor/VS Code/Antigravity IDE's.
 
 ---
 
