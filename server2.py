@@ -28,11 +28,11 @@ def faq_retrieval_tool(query: str) -> str:
     return response
 
 @mcp.tool()
-def bright_data_web_search_tool(query: str) -> list[str]:
+def free_web_search_tool(query: str) -> list[dict]:
     """
-    Search for information on a given topic using Bright Data.
+    Search the web for up-to-date information for free using DuckDuckGo.
     Use this tool when the user asks about a specific topic or question 
-    that is not related to general machine learning.
+    that is not related to the FAQ domain.
 
     Input:
         query: str -> The user query to search for information
@@ -44,36 +44,36 @@ def bright_data_web_search_tool(query: str) -> list[str]:
     if not isinstance(query, str):
         raise ValueError("query must be a string")
     
-    import os
-    import ssl
-    import requests
-    from dotenv import load_dotenv
-
-    # Load environment variables and configure SSL
-    load_dotenv()
-    ssl._create_default_https_context = ssl._create_unverified_context
-
-    # Bright Data configuration
-    host = 'brd.superproxy.io'
-    port = 33335
+    from duckduckgo_search import DDGS
     
-    # get username and password from brightdata.com
-    username = os.getenv("BRIGHT_DATA_USERNAME")
-    password = os.getenv("BRIGHT_DATA_PASSWORD")
+    with DDGS() as ddgs:
+        # Returns a list of dictionaries with title, href, and body
+        results = [r for r in ddgs.text(query, max_results=5)]
+    return results
 
-    proxy_url = f'http://{username}:{password}@{host}:{port}'
-    proxies = {
-        'http': proxy_url,
-        'https': proxy_url
-    }
-
-    # Format query and make request
-    formatted_query = "+".join(query.split(" "))
-    url = f"https://www.google.com/search?q={formatted_query}&brd_json=1&num=50"
-    response = requests.get(url, proxies=proxies, verify=False)
-
-    # Return organic search results
-    return response.json()['organic']
+@mcp.tool()
+def fetch_wikipedia_summary(topic: str) -> str:
+    """
+    Fetch a summary of a topic from Wikipedia.
+    Use this tool for factual questions about historical events, companies, or people.
+    
+    Input:
+        topic: str -> The subject to look up on Wikipedia
+        
+    Output:
+        summary: str -> A short summary describing the topic
+    """
+    if not isinstance(topic, str):
+        raise ValueError("topic must be a string")
+        
+    import wikipedia
+    
+    try:
+        return wikipedia.summary(topic, sentences=5)
+    except wikipedia.exceptions.DisambiguationError as e:
+        return f"Topic is too broad. Did you mean one of these? {e.options[:5]}"
+    except wikipedia.exceptions.PageError:
+        return f"Could not find a Wikipedia page for '{topic}'."
 
 if __name__ == "__main__":
     print("Starting MCP server at http://127.0.0.1:8080 on port 8080")

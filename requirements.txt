@@ -5,4 +5,5 @@ einops
 hf_xet
 mcp[cli]
 httpx
-dotenv
+duckduckgo-search
+wikipedia

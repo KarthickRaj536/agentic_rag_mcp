@@ -1,53 +1,46 @@
 # 🚀 Agentic RAG System using MCP
 
-An **Agentic Retrieval-Augmented Generation (RAG)** application powered by the **Model Context Protocol (MCP)**, enabling seamless integration of custom AI tools inside the Cursor/VS Code/Antigravity IDE's.
+An **Agentic Retrieval-Augmented Generation (RAG)** application powered by the **Model Context Protocol (MCP)**, enabling seamless integration of custom AI tools inside Cursor, VS Code, and other MCP-compatible environments.
 
 ## 🧩 Tech Stack
 
-- Python  
-- Model Context Protocol (MCP)  
-- Qdrant (Vector Database)  
-- LlamaIndex  
-- HuggingFace Embeddings  
-- Bright Data (Web Search)  
-- Cursor IDE  
+- **Python**: Core logic and MCP server implementation.
+- **Model Context Protocol (MCP)**: For tool discovery and execution.
+- **Qdrant (Vector Database)**: High-performance vector storage for RAG.
+- **LlamaIndex**: Framework for connecting LLMs with external data.
+- **HuggingFace Embeddings**: For converting text to semantic vectors.
+- **DuckDuckGo Search**: Free, real-time web search integration.
+- **Wikipedia**: Direct factual knowledge retrieval.
 
 ## ⚙️ Setup Instructions
 
 ### 1️⃣ Start Qdrant (Vector Database)
 
+Ensure Docker is installed and running, then execute:
+
 ```bash
 docker run -p 6333:6333 -p 6334:6334 -v qdrant_storage:/qdrant/storage:z qdrant/qdrant
-````
+```
 
-### 2️⃣ Setup Bright Data Account
+### 2️⃣ Install Dependencies
 
-1. Create a free account: [https://brightdata.com/](https://brightdata.com/)
-2. Generate your credentials (email & password)
-3. Add them inside `.env`
+Using `uv` for fast dependency management and project synchronization:
+
+```bash
+uv add -r requirements.txt
+```
+
+Alternatively, to add specific packages:
+
+```bash
+uv add mcp duckduckgo-search wikipedia requests llama-index qdrant-client llama-index-embeddings-huggingface python-dotenv
+```
 
 ### 3️⃣ Configure MCP Server in Cursor
 
-#### 📌 Find your `uv` path
+Go to: `Cursor/Antigravity/VSCode → Settings → MCP Servers → Add New`
 
-**Mac / Linux**
-
-```bash
-which uv
-```
-
-**Windows**
-
-```bash
-where uv
-```
-
-#### 📌 Add MCP Server
-
-Go to:
-`Cursor → Settings → MCP Servers → Add New`
-
-Add the following in `mcp.json`:
+#### 📌 Add the following in your MCP configuration:
 
 ```json
 {
@@ -65,53 +58,49 @@ Add the following in `mcp.json`:
 }
 ```
 
-## ✅ Expected Output
+> [!NOTE]
+> - Use `which uv` (Mac/Linux) or `where uv` (Windows) to find your `path/to/uv`.
+> - Replace `absolute/path/to/projectdir` with the full path to this repository on your machine.
 
-* MCP server status turns **green**
-* Available tools:
+## ✅ Available Tools
 
-  * `f1_faq_search_tool`
-  * `bright_data_web_search_tool`
+Once the MCP server is green, the following tools will be available:
 
-## 💬 Usage
+- `faq_retrieval_tool`: Retrieves the most relevant documents from the F1 Racing FAQ collection.
+- `free_web_search_tool`: Performs real-time web searches using DuckDuckGo (Free, no API key required).
+- `fetch_wikipedia_summary`: Fetches summaries of topics, historical events, or famous people directly from Wikipedia.
 
-1. Open Cursor Chat (`Ctrl + L`)
-2. Ask queries like:
+## 💬 Usage Examples
 
-   * "Search F1 FAQs about pit stops"
-   * "Get latest F1 news"
-3. The agent will:
+1. **Internal Knowledge**: "Search F1 FAQs about DRS rules."
+2. **Real-time News**: "What is the latest news about the 2024 F1 season?"
+3. **Factual Research**: "Who won the IPL in 2023?" (Uses Wikipedia/Web Search).
 
-   * Retrieve context from Qdrant
-   * Perform web search using Bright Data
-   * Generate a response using LLM
+## 🧠 Architecture
 
-## 🧠 How It Works
-
-```
-User Query
-   ↓
-MCP Agent
-   ↓
-Tool Selection
-   ├── Vector Search (Qdrant)
-   └── Web Search (Bright Data)
-   ↓
-Context Aggregation
-   ↓
-LLM Response
+```mermaid
+graph TD
+    User[User Query] --> Agent[MCP Agent]
+    Agent --> Tools{Tool Selection}
+    Tools --> Qdrant[Vector Search - Qdrant]
+    Tools --> DDG[Web Search - DuckDuckGo]
+    Tools --> Wiki[Wikipedia Fetcher]
+    Qdrant --> Agg[Context Aggregation]
+    DDG --> Agg
+    Wiki --> Agg
+    Agg --> LLM[LLM Response Generation]
+    LLM --> Final[Final Response to User]
 ```
 
 ## 📌 Notes
 
-* Ensure Docker is running before starting Qdrant
-* Verify `uv` path is correct
-* Do not commit credentials to GitHub
+- This version uses **completely free** search tools (DuckDuckGo & Wikipedia), replacing the need for paid proxies like Bright Data.
+- Ensure Qdrant is running before interacting with the FAQ tool.
+- The `rag2.py` script handles data ingestion and vectorization logic.
 
 ## ⭐ Future Improvements
 
-* UI dashboard
-* Multi-document ingestion
-* Streaming responses
-* Improved tool orchestration
-
+- Automated document ingestion pipeline.
+- Multi-modal support for image search.
+- Enhanced agent memory and conversation history.
+- Web UI for monitoring tool calls and RAG performance.
